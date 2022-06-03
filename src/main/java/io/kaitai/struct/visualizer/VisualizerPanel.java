@@ -26,17 +26,15 @@ import io.kaitai.struct.languages.JavaCompiler$;
 
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+
+import ru.mingun.kaitai.struct.tree.ChunkNode;
+import ru.mingun.kaitai.struct.tree.StructModel;
 
 import tv.porst.jhexview.JHexView;
 import tv.porst.jhexview.SimpleDataProvider;
@@ -95,10 +93,17 @@ public class VisualizerPanel extends JPanel {
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll, hexEditor);
 
         tree.setShowsRootHandles(true);
-        KaitaiTreeListener treeListener = new KaitaiTreeListener();
-        tree.addTreeWillExpandListener(treeListener);
-        tree.addTreeSelectionListener(treeListener);
-        tree.setModel(model);
+        tree.addTreeSelectionListener(event -> {
+            final TreePath path = event.getPath();
+            if (path.getLastPathComponent() instanceof ChunkNode) {
+                final ChunkNode node = (ChunkNode) path.getLastPathComponent();
+                final long start = node.getStart();
+                final long end   = node.getEnd();
+                hexEditor.setCurrentOffset(start);
+                // Selection in nibbles, so multiply by 2
+                //hexEditor.setSelectionLength((end - start) * 2);
+            }
+        });
     }
 
     public void loadAll(String dataFileName, String ksyFileName) throws Exception {
@@ -106,15 +111,13 @@ public class VisualizerPanel extends JPanel {
         loadStruct();
     }
 
-    private void loadStruct() throws IOException {
+    private void loadStruct() throws IOException, ReflectiveOperationException {
+        tree.setModel(new StructModel(struct));
+
         struct._io().seek(0);
         byte[] buf = struct._io().readBytesFull();
         hexEditor.setData(new SimpleDataProvider(buf));
         hexEditor.setDefinitionStatus(JHexView.DefinitionStatus.DEFINED);
-
-        final DataNode root = new DataNode(0, struct, "[root]");
-        model.setRoot(root);
-        root.explore(model /*, progressListener */, null);
     }
 
     public JSplitPane getSplitPane() {
@@ -165,6 +168,7 @@ public class VisualizerPanel extends JPanel {
      */
     private void parseFileWithKSY(String ksyFileName, String binaryFileName) throws Exception {
         final String javaSrc = compileKSY(ksyFileName);
+        System.err.println(javaSrc);
         final Matcher m = TOP_CLASS_NAME_AND_PARAMETERS.matcher(javaSrc);
         if (!m.find()) {
             throw new RuntimeException("Unable to find top-level class in generated .java");
@@ -218,36 +222,5 @@ public class VisualizerPanel extends JPanel {
         if (clazz == float.class  ) return 0.0f;
         if (clazz == double.class ) return 0.0;
         return null;
-    }
-
-    public class KaitaiTreeListener implements TreeWillExpandListener, TreeSelectionListener {
-        @Override
-        public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-            TreePath path = event.getPath();
-            if (path.getLastPathComponent() instanceof DataNode) {
-                DataNode node = (DataNode) path.getLastPathComponent();
-                node.explore(model /* , progressListener */, null);
-            }
-        }
-
-        @Override
-        public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-        }
-
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
-            hexEditor.getSelectionModel().clearSelection();
-            for (final TreePath path : tree.getSelectionPaths()) {
-                final Object selected = path.getLastPathComponent();
-                if (!(selected instanceof DataNode)) continue;
-
-                final DataNode node = (DataNode)selected;
-                final Integer start = node.posStart();
-                final Integer end   = node.posEnd();
-                if (start == null || end == null) continue;
-                // Selection in nibbles, so multiply by 2
-                hexEditor.getSelectionModel().addSelectionInterval(2*start, 2*end-1);
-            }
-        }
     }
 }
