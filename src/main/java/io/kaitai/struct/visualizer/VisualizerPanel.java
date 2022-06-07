@@ -95,18 +95,20 @@ public class VisualizerPanel extends JPanel {
 
         tree.setShowsRootHandles(true);
         tree.addTreeSelectionListener(event -> {
-            final TreePath path = event.getPath();
-            if (path.getLastPathComponent() instanceof ChunkNode) {
-                final ChunkNode node = (ChunkNode) path.getLastPathComponent();
-                if (node.getSpan() == null) {
-                    hexEditor.getSelectionModel().clearSelection();
-                } else {
-                    final Span span = node.getSpan();
-                    // Selection in nibbles, so multiply by 2
-                    hexEditor.getSelectionModel().setSelectionInterval(
-                            2 * span.getStart(),
-                            2 * span.getEnd() - 1
-                    );
+            hexEditor.getSelectionModel().clearSelection();
+            if (tree.getSelectionPaths() == null) {
+                return;
+            }
+            for (TreePath path : tree.getSelectionPaths()) {
+                if (path.getLastPathComponent() instanceof ChunkNode) {
+                    final ChunkNode node = (ChunkNode) path.getLastPathComponent();
+                    if (node.getSpan() != null) {
+                        // Selection in nibbles, so multiply by 2
+                        hexEditor.getSelectionModel().addSelectionInterval(
+                                2 * node.getSpan().getStart(),
+                                2 * node.getSpan().getEnd() - 1
+                        );
+                    }
                 }
             }
         });
