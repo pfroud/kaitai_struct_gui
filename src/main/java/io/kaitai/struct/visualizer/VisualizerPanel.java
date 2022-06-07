@@ -13,18 +13,21 @@ import io.kaitai.struct.formats.JavaClassSpecs;
 import io.kaitai.struct.formats.JavaKSYParser;
 import io.kaitai.struct.languages.JavaCompiler$;
 import org.mdkt.compiler.InMemoryJavaCompiler;
+import ru.mingun.kaitai.struct.tree.ChunkNode;
+import ru.mingun.kaitai.struct.tree.StructModel;
 import tv.porst.jhexview.JHexView;
 import tv.porst.jhexview.SimpleDataProvider;
 
-import javax.swing.*;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -74,7 +77,6 @@ public class VisualizerPanel extends JPanel {
     private static final Color SELECTION = new Color(0xc0c0c0);
 
     private final JTree JTREE = new JTree();
-    private final DefaultTreeModel TREE_MODEL = new DefaultTreeModel(null);
     private final JHexView HEX_EDITOR = new JHexView();
     private final JSplitPane SPLIT_PANE;
     private final MainWindow MAIN_WINDOW;
@@ -124,10 +126,24 @@ public class VisualizerPanel extends JPanel {
         SPLIT_PANE.setDividerLocation(200);
 
         JTREE.setShowsRootHandles(true);
-        final KaitaiTreeListener treeListener = new KaitaiTreeListener();
-        JTREE.addTreeWillExpandListener(treeListener);
-        JTREE.addTreeSelectionListener(treeListener);
-        JTREE.setModel(TREE_MODEL);
+        JTREE.addTreeSelectionListener(event -> {
+            HEX_EDITOR.getSelectionModel().clearSelection();
+            if (JTREE.getSelectionPaths() == null) {
+                return;
+            }
+            for (TreePath path : JTREE.getSelectionPaths()) {
+                if (path.getLastPathComponent() instanceof ChunkNode) {
+                    final ChunkNode node = (ChunkNode) path.getLastPathComponent();
+                    if (node.getSpan() != null) {
+                        // Selection in nibbles, so multiply by 2
+                        HEX_EDITOR.getSelectionModel().addSelectionInterval(
+                                2 * node.getSpan().getStart(),
+                                2 * node.getSpan().getEnd() - 1
+                        );
+                    }
+                }
+            }
+        });
     }
 
     public void setBinaryStreamToParse(ByteBufferKaitaiStream stream) {
@@ -242,8 +258,9 @@ public class VisualizerPanel extends JPanel {
             final Method readMethod = kaitaiStructClass.getMethod("_read");
             readMethod.invoke(kaitaiStructInstance);
 
+            JTREE.setModel(new StructModel(kaitaiStructInstance));
+
             updateHexEditorData();
-            updateJTree();
         }
     }
 
@@ -261,12 +278,6 @@ public class VisualizerPanel extends JPanel {
         final byte[] allBytes = kaitaiStructInstance._io().readBytesFull(); //read all remaining bytes
         HEX_EDITOR.setData(new SimpleDataProvider(allBytes));
         HEX_EDITOR.setDefinitionStatus(JHexView.DefinitionStatus.DEFINED);
-    }
-
-    private void updateJTree(){
-        final DataNode root = new DataNode(0, kaitaiStructInstance, "[root]");
-        TREE_MODEL.setRoot(root);
-        root.explore(TREE_MODEL, null);
     }
 
     public JSplitPane getSplitPane() {
@@ -410,34 +421,5 @@ public class VisualizerPanel extends JPanel {
         return null;
     }
 
-    public class KaitaiTreeListener implements TreeWillExpandListener, TreeSelectionListener {
-        @Override
-        public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-            final TreePath path = event.getPath();
-            if (path.getLastPathComponent() instanceof DataNode) {
-                DataNode node = (DataNode) path.getLastPathComponent();
-                node.explore(TREE_MODEL, null);
-            }
-        }
 
-        @Override
-        public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-        }
-
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
-            HEX_EDITOR.getSelectionModel().clearSelection();
-            for (final TreePath path : JTREE.getSelectionPaths()) {
-                final Object selected = path.getLastPathComponent();
-                if (!(selected instanceof DataNode)) continue;
-
-                final DataNode node = (DataNode) selected;
-                final Integer start = node.posStart();
-                final Integer end = node.posEnd();
-                if (start == null || end == null) continue;
-                // Selection in nibbles, so multiply by 2
-                HEX_EDITOR.getSelectionModel().addSelectionInterval(2 * start, 2 * end - 1);
-            }
-        }
-    }
 }
