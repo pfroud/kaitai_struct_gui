@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
+import ru.mingun.kaitai.struct.Span;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
 import ru.mingun.kaitai.struct.tree.StructModel;
 
@@ -97,11 +98,16 @@ public class VisualizerPanel extends JPanel {
             final TreePath path = event.getPath();
             if (path.getLastPathComponent() instanceof ChunkNode) {
                 final ChunkNode node = (ChunkNode) path.getLastPathComponent();
-                final long start = node.getStart();
-                final long end   = node.getEnd();
-                hexEditor.setCurrentOffset(start);
-                // Selection in nibbles, so multiply by 2
-                //hexEditor.setSelectionLength((end - start) * 2);
+                if (node.getSpan() == null) {
+                    hexEditor.getSelectionModel().clearSelection();
+                } else {
+                    final Span span = node.getSpan();
+                    // Selection in nibbles, so multiply by 2
+                    hexEditor.getSelectionModel().setSelectionInterval(
+                            2 * span.getStart(),
+                            2 * span.getEnd() - 1
+                    );
+                }
             }
         });
     }
