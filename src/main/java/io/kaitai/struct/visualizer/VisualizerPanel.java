@@ -33,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
-import ru.mingun.kaitai.struct.Span;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
 import ru.mingun.kaitai.struct.tree.StructModel;
 
