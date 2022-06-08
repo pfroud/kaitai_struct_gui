@@ -24,8 +24,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.lang.reflect.Constructor;
@@ -144,6 +146,17 @@ public class VisualizerPanel extends JPanel {
                 }
             }
         });
+
+        // https://docs.oracle.com/javase/tutorial/uiswing/components/tree.html#display
+        JTREE.setCellRenderer(new DefaultTreeCellRenderer() {
+            public Component getTreeCellRendererComponent(JTree tree, Object treeNode, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                super.getTreeCellRendererComponent(tree, treeNode, sel, expanded, leaf, row, hasFocus);
+                TreeNodeIcons.getTreeNodeIcon(treeNode).ifPresent(this::setIcon);
+                return this;
+            }
+        });
+
+
     }
 
     public void setBinaryStreamToParse(ByteBufferKaitaiStream stream) {
