@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
@@ -78,7 +79,7 @@ public class VisualizerPanel extends JPanel {
      */
     private static final Color SELECTION = new Color(0xc0c0c0);
 
-    private final JTree JTREE = new JTree();
+    private final JTree JTREE = new JTree(new DefaultMutableTreeNode("<root>"));
     private final JHexView HEX_EDITOR = new JHexView();
     private final JSplitPane SPLIT_PANE;
     private final MainWindow MAIN_WINDOW;
