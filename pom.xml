@@ -57,7 +57,7 @@
     <dependency>
       <groupId>com.github.Mingun</groupId>
       <artifactId>kaitai-struct-model</artifactId>
-      <version>2bff7075e8998ad25c183294704d0a81265aa7b3</version>
+      <version>master</version>
     </dependency>
     <dependency>
       <groupId>com.formdev</groupId>
