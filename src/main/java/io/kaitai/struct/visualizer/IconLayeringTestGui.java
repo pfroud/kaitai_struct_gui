@@ -1,11 +1,19 @@
 package io.kaitai.struct.visualizer;
 
 import com.kitfox.svg.SVGDiagram;
+import com.kitfox.svg.SVGElement;
+import com.kitfox.svg.SVGElementException;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.SVGUniverse;
+import com.kitfox.svg.animation.AnimationElement;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,10 +21,6 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.net.URL;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  * @author Peter Froud
@@ -24,79 +28,92 @@ import javax.swing.tree.DefaultTreeModel;
 public class IconLayeringTestGui extends javax.swing.JFrame {
 
     private static final SVGUniverse SVG_UNIVERSE = new SVGUniverse();
-
     private static final int ICON_SIZE = 16;
 
-    private enum DataType {
-        BOOLEAN(1, "boolean"),
-        BYTE_ARRAY(2, "byteArray"),
-        INTEGER(3, "integer"),
-        ENUM(4, "enum"),
-        FLOAT(5, "float"),
-        STRING(6, "string"),
-        STRUCT(7, "struct");
+    private static enum DataType {
+        BOOLEAN(1, "boolean", Color.decode("#e76ade"), Color.decode("#9c3495")), //magenta
+        BYTE_ARRAY(2, "byteArray", Color.decode("#6a71e7"), Color.decode("#4e53b2")), //blue
+        INTEGER(3, "integer", Color.decode("#52cfcd"), Color.decode("#279594")), //cyan
+        ENUM(4, "enum", Color.decode("#5fcd43"), Color.decode("#39a71c")), //green
+        FLOAT(5, "float", Color.decode("#ede72c"), Color.decode("#bbb620")), //yellow
+        STRING(6, "string", Color.decode("#e38733"), Color.decode("#c06614")), //orange
+        STRUCT(7, "struct", Color.decode("#d44747"), Color.decode("#c42222")); //red
 
-        final int gridx;
-        final String svgFilenamePart;
-        private final URL resourceUrl;
-
+        final int GRID_X;
+        final String DISPLAY_NAME;
+        final URL RESOURCE_URL;
+        final Color FILL;
+        final Color STROKE;
         SVGDiagram svgDiagram;
 
-        DataType(int gridx, String svgFilenamePart) {
-            this.gridx = gridx;
-            this.svgFilenamePart = svgFilenamePart;
-            resourceUrl = getClass().getResource("/layered-icons/dataType-" + svgFilenamePart + ".svg");
+        DataType(int gridx, String svgFilenamePart, Color fill, Color stroke) {
+            GRID_X = gridx;
+            DISPLAY_NAME = svgFilenamePart;
+            FILL = fill;
+            STROKE = stroke;
+            RESOURCE_URL = getClass().getResource("/layered-icons/dataType-" + svgFilenamePart + ".svg");
             reloadSvg();
         }
 
         void reloadSvg() {
-            svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(resourceUrl, true));
+            svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(RESOURCE_URL, true));
         }
     }
 
-    private enum SequentialOrInstance {
+    private static enum SequentialOrInstance {
         SEQUENTIAL("sequential"),
         INSTANCE("instance");
 
-        private final URL resourceUrl;
+        final URL RESOURCE_URL;
         SVGDiagram svgDiagram;
+        SVGElement baseShape;
 
         SequentialOrInstance(String svgFilenamePart) {
-            resourceUrl = getClass().getResource("/layered-icons/base-" + svgFilenamePart + ".svg");
+            RESOURCE_URL = getClass().getResource("/layered-icons/base-" + svgFilenamePart + ".svg");
             reloadSvg();
         }
 
+        void setColors(DataType dataType) throws SVGElementException {
+            baseShape.setAttribute("fill", AnimationElement.AT_CSS, colorToHex(dataType.FILL));
+            baseShape.setAttribute("stroke", AnimationElement.AT_CSS, colorToHex(dataType.STROKE));
+        }
+
+        private static String colorToHex(Color color) {
+            return String.format("#%06x", color.getRGB() & 0xFF_FF_FF); //remove alpha channel using bit mask
+        }
+
         void reloadSvg() {
-            svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(resourceUrl, true));
+            svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(RESOURCE_URL, true));
+            baseShape = svgDiagram.getElement("base-shape");
         }
     }
 
-    private enum ScalarOrList {
+    private static enum ScalarOrList {
 
         SCALAR(null),
         LIST("list");
 
-        final URL resourceUrl;
+        final URL RESOURCE_URL;
         SVGDiagram svgDiagram;
 
         ScalarOrList(String svgFilenamePart) {
             if (svgFilenamePart == null) {
                 svgDiagram = null;
-                resourceUrl = null;
+                RESOURCE_URL = null;
             } else {
-                resourceUrl = getClass().getResource("/layered-icons/decorator-" + svgFilenamePart + ".svg");
+                RESOURCE_URL = getClass().getResource("/layered-icons/decorator-" + svgFilenamePart + ".svg");
                 reloadSvg();
             }
         }
 
         void reloadSvg() {
-            if (resourceUrl != null) {
-                svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(resourceUrl, true));
+            if (RESOURCE_URL != null) {
+                svgDiagram = SVG_UNIVERSE.getDiagram(SVG_UNIVERSE.loadSVG(RESOURCE_URL, true));
             }
         }
     }
 
-    private class AllThree {
+    private static class AllThree {
 
         DataType dataType;
         SequentialOrInstance sequentialOrInstance;
@@ -118,16 +135,18 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
 
         try {
             for (DataType dataType : DataType.values()) {
-                gbc.gridx = dataType.gridx;
+                gbc.gridx = dataType.GRID_X;
                 gbc.gridy = 1;
-                getContentPane().add(new JLabel(dataType.svgFilenamePart), gbc);
+                getContentPane().add(new JLabel(dataType.DISPLAY_NAME), gbc);
 
                 for (SequentialOrInstance sequentialOrInstance : SequentialOrInstance.values()) {
                     for (ScalarOrList scalarOrList : ScalarOrList.values()) {
+
                         getContentPane().add(
-                                new JLabel(new MyIcon(dataType, sequentialOrInstance, scalarOrList)),
+                                new JLabel(new LayeredSvgIcon(dataType, sequentialOrInstance, scalarOrList)),
                                 setGbcPosition(gbc, dataType, sequentialOrInstance, scalarOrList)
                         );
+
                         AllThree all3 = new AllThree();
                         all3.dataType = dataType;
                         all3.sequentialOrInstance = sequentialOrInstance;
@@ -151,7 +170,7 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
                 final Object userObject = treeNode.getUserObject();
                 if (userObject instanceof AllThree) {
                     AllThree all3 = (AllThree) treeNode.getUserObject();
-                    setIcon(new MyIcon(all3.dataType, all3.sequentialOrInstance, all3.scalarOrList));
+                    setIcon(new LayeredSvgIcon(all3.dataType, all3.sequentialOrInstance, all3.scalarOrList));
                 }
                 return this;
             }
@@ -161,13 +180,13 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
 
     }
 
-    private static class MyIcon implements Icon {
+    private static class LayeredSvgIcon implements Icon {
 
         private final DataType dataType;
         private final SequentialOrInstance sequentialOrInstance;
         private final ScalarOrList scalarOrList;
 
-        MyIcon(DataType dataType, SequentialOrInstance sequentialOrInstance, ScalarOrList scalarOrList) {
+        LayeredSvgIcon(DataType dataType, SequentialOrInstance sequentialOrInstance, ScalarOrList scalarOrList) {
             this.dataType = dataType;
             this.sequentialOrInstance = sequentialOrInstance;
             this.scalarOrList = scalarOrList;
@@ -190,6 +209,10 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
             g.translate(x, y);
+            try {
+                sequentialOrInstance.setColors(dataType);
+            } catch (SVGElementException ignore) {
+            }
             try {
                 sequentialOrInstance.svgDiagram.render(g);
                 dataType.svgDiagram.render(g);
@@ -223,7 +246,7 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
         +--------+-------------------+-----------+--------+---------+------+-------+--------+--------+
          */
 
-        gbc.gridx = dataType.gridx;
+        gbc.gridx = dataType.GRID_X;
 
         switch (sequentialOrInstance) {
             case SEQUENTIAL:
@@ -356,7 +379,7 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                | javax.swing.UnsupportedLookAndFeelException ex) {
+                 | javax.swing.UnsupportedLookAndFeelException ex) {
             ex.printStackTrace();
         }
 
@@ -367,6 +390,7 @@ public class IconLayeringTestGui extends javax.swing.JFrame {
             }
         });
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonReloadSvgs;
