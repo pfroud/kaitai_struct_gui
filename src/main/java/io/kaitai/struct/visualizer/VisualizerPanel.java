@@ -12,6 +12,7 @@ import io.kaitai.struct.format.KSVersion;
 import io.kaitai.struct.formats.JavaClassSpecs;
 import io.kaitai.struct.formats.JavaKSYParser;
 import io.kaitai.struct.languages.JavaCompiler$;
+import io.kaitai.struct.visualizer.icons.LayeredSvgIcon;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
 import ru.mingun.kaitai.struct.tree.StructModel;
@@ -150,9 +151,13 @@ public class VisualizerPanel extends JPanel {
 
         // https://docs.oracle.com/javase/tutorial/uiswing/components/tree.html#display
         JTREE.setCellRenderer(new DefaultTreeCellRenderer() {
+            @Override
             public Component getTreeCellRendererComponent(JTree tree, Object treeNode, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 super.getTreeCellRendererComponent(tree, treeNode, sel, expanded, leaf, row, hasFocus);
-                TreeNodeIcons.getTreeNodeIcon(treeNode).ifPresent(this::setIcon);
+                if (treeNode instanceof ChunkNode) {
+                    ChunkNode chunkNode = (ChunkNode) treeNode;
+                    setIcon(new LayeredSvgIcon(chunkNode));
+                }
                 return this;
             }
         });
