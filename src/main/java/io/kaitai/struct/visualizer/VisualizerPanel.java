@@ -194,6 +194,8 @@ public class VisualizerPanel extends JPanel {
                 publish("Compiling KSY file into Java source code...");
                 final String javaSourceCode = compileKsyFileToJavaSourceCode(ksyFileName);
 
+                //SwingUtilities.invokeLater(() -> new SourceCodeViewerJFrame(javaSourceCode).setVisible(true));
+
                 final Matcher topLevelClassMatcher = TOP_CLASS_NAME_AND_PARAMETERS.matcher(javaSourceCode);
                 if (!topLevelClassMatcher.find()) {
                     throw new RuntimeException("Unable to find top-level class in generated .java");
