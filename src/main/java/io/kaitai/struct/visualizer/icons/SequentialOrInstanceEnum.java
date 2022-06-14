@@ -10,7 +10,7 @@ import ru.mingun.kaitai.struct.tree.ChunkNode;
 import java.awt.Color;
 import java.net.URL;
 
-enum SequentialOrInstanceEnum {
+public enum SequentialOrInstanceEnum {
     SEQUENTIAL("sequential"),
     INSTANCE("instance");
 

@@ -7,7 +7,7 @@ import ru.mingun.kaitai.struct.tree.ListNode;
 
 import java.net.URL;
 
-enum ScalarOrListEnum {
+public enum ScalarOrListEnum {
 
     SCALAR(null), // no icon for scalar
     LIST("list");

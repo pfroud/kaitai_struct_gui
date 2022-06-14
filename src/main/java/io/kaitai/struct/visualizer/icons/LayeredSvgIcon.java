@@ -13,9 +13,9 @@ public class LayeredSvgIcon implements Icon {
 
     private static final int ICON_SIZE = 16;
 
-    private final DataTypeEnum DATA_TYPE;
-    private final SequentialOrInstanceEnum SEQUENTIAL_OR_INSTANCE;
-    private final ScalarOrListEnum SCALAR_OR_LIST;
+    public final DataTypeEnum DATA_TYPE;
+    public final SequentialOrInstanceEnum SEQUENTIAL_OR_INSTANCE;
+    public final ScalarOrListEnum SCALAR_OR_LIST;
 
     public LayeredSvgIcon(ChunkNode chunkNode) {
         this(

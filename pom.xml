@@ -69,6 +69,12 @@
             <artifactId>rsyntaxtextarea</artifactId>
             <version>3.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -113,6 +119,34 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+            </plugin>
+            <plugin>
+                <!-- https://github.com/valery1707/kaitai-maven-plugin -->
+                <groupId>com.github.pfroud</groupId>
+                <artifactId>kaitai-maven-plugin</artifactId>
+                <version>master</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <url>
+                        https://github.com/kaitai-io/kaitai_struct_compiler/releases/download/0.9/kaitai-struct-compiler-0.9.zip
+                    </url>
+                    <sourceDirectory>src/test/resources/ksy</sourceDirectory>
+                    <output>src/test/resources/compiled-ks</output>
+                    <packageName>io.kaitai.struct.visualizer</packageName>
+                    <readPos>true</readPos>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -143,5 +177,13 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <!-- fork of kaitai-maven-plugin -->
+            <id>jitpack.io</id>
+            <name>jitpack.io</name>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

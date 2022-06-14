@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-enum DataTypeEnum {
+public enum DataTypeEnum {
     BOOLEAN(1, "boolean", Color.decode("#e76ade"), Color.decode("#9c3495")), //magenta
     BYTE_ARRAY(2, "byteArray", Color.decode("#6a71e7"), Color.decode("#4e53b2")), //blue
     INTEGER(3, "integer", Color.decode("#52cfcd"), Color.decode("#279594")), //cyan
