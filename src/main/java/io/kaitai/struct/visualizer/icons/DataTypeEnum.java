@@ -89,8 +89,12 @@ enum DataTypeEnum {
             */
             final Class<?> classToGetIconFor;
             if (simpleNode.getValueClass() == Object.class) {
-                // use runtime class
-                classToGetIconFor = simpleNode.getValue().getClass();
+                if (simpleNode.getValue() == null) {
+                    return UNKNOWN;
+                } else {
+                    // use runtime class
+                    classToGetIconFor = simpleNode.getValue().getClass();
+                }
             } else {
                 // use compile-time class
                 classToGetIconFor = simpleNode.getValueClass();
@@ -119,9 +123,7 @@ enum DataTypeEnum {
     }
 
     private static DataTypeEnum fromClass(Class<?> clazz) {
-        if (clazz == null) {
-            return UNKNOWN;
-        } else if (clazz.isEnum()) {
+        if (clazz.isEnum()) {
             return ENUM;
         } else if (KaitaiStruct.class.isAssignableFrom(clazz)) {
             // happens when getting icon for a ListNode of KaitaiStructs
