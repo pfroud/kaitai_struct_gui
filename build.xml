@@ -45,15 +45,25 @@
 
 
         <!-- https://ant.apache.org/manual/Tasks/exec.html -->
-        <exec executable="${ksc-absolute-path}" outputproperty="ksc-output">
+        <exec executable="${ksc-absolute-path}" outputproperty="ksc-output"
+              failonerror="false" resultproperty="ksc-return-code"
+              failifexecutionfails="true">
             <!-- https://ant.apache.org/manual/using.html#arg -->
-            <arg line="--target java --outdir ${project.build.testSourceDirectory} --verbose file --java-package ${output-package} --debug ${ksy-files} "/>
+            <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --verbose file --java-package ${output-package} --debug ${ksy-files} "/>
         </exec>
 
         <!-- https://ant.apache.org/manual/Tasks/echo.html -->
         <echo level="info" message="-------------------------- Output from kaitai-struct-compiler: ----------------"/>
         <echo level="info" message="${ksc-output}"/>
         <echo level="info" message="-----------------------------------------------------------------------------"/>
+
+        <fail message="kaitai-struct-compiler returned error code ${ksc-return-code}"> <!-- https://stackoverflow.com/a/27294765/7376577 -->
+            <condition>
+                <not>
+                    <equals arg1="${ksc-return-code}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="clean-compiled-java-files">

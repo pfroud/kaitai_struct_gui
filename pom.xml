@@ -124,7 +124,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M7</version>
             </plugin>
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -132,7 +131,7 @@
                 <executions>
                     <execution>
                         <id>compile-ksy-to-java</id>
-                        <phase>test</phase>
+                        <phase>process-test-resources</phase>
                         <configuration>
                             <target>
                                 <ant antfile="build.xml" target="compile-ksy-to-java"/>
@@ -144,7 +143,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 
