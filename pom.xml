@@ -134,7 +134,7 @@
                         <phase>process-test-resources</phase>
                         <configuration>
                             <target>
-                                <ant antfile="build.xml" target="compile-ksy-to-java"/>
+                                <ant antfile="build.xml" target="compile.ksy.files.to.java"/>
                             </target>
                         </configuration>
                         <goals>

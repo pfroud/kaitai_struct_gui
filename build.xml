@@ -1,74 +1,71 @@
 <project name="kaitai-struct-gui">
 
-    <property name="output-package" value="compiled_from_ksy"/>
+    <!-- https://ant.apache.org/manual/ -->
+
+    <property name="java.output.package" value="compiled_from_ksy"/>
     <property name="project.build.testSourceDirectory" value="src/test/java"/>
+    <property environment="env"/> <!-- Make environment variables accessible using the 'env' prefix -->
 
-    <target name="compile-ksy-to-java">
-        <!-- https://stackoverflow.com/a/6247247/7376577 -->
-        <property environment="env"/>
 
-        <!-- https://ant.apache.org/manual/Tasks/fail.html -->
-        <fail unless="env.KAITAI_STRUCT_COMPILER_HOME"
-              message="The KAITAI_STRUCT_COMPILER_HOME environment variable is not set."/>
+    <target name="-check.ksc.home.is.set">
+        <condition property="is.ksc.home.set">
+            <isset property="env.KAITAI_STRUCT_COMPILER_HOME"/>
+        </condition>
+    </target>
 
-        <!-- https://ant.apache.org/manual/Tasks/condition.html -->
-        <condition property="ksc-filename" value="kaitai-struct-compiler.bat" else="kaitai-struct-compiler">
-            <!-- https://ant.apache.org/manual/Tasks/conditions.html#os -->
+
+    <target name="-check.ksc.available" depends="-check.ksc.home.is.set" if="is.ksc.home.set">
+
+        <!-- On Windows use .bat file, otherwise use shell script. -->
+        <condition property="ksc.file.name" value="kaitai-struct-compiler.bat" else="kaitai-struct-compiler">
             <os family="windows"/>
         </condition>
 
-        <!-- https://ant.apache.org/manual/Tasks/property.html -->
-        <property name="ksc-absolute-path"
-                  value="${env.KAITAI_STRUCT_COMPILER_HOME}\bin\${ksc-filename}"/>
+        <property name="ksc.absolute.path" value="${env.KAITAI_STRUCT_COMPILER_HOME}\bin\${ksc.file.name}"/>
 
-        <!-- https://ant.apache.org/manual/Tasks/available.html -->
-        <available property="ksc-exists" file="${ksc-absolute-path}"/>
+        <available property="is.ksc.available" file="${ksc.absolute.path}"/>
+    </target>
 
-        <fail unless="ksc-exists"
-              message="Cannot access kaitai-struct-compiler at this path: &quot;${ksc-absolute-path}&quot;"/>
 
-        <property name="ksy-folder" value=""/>
-
-        <!-- https://stackoverflow.com/a/17821729/7376577
-         https://ant.apache.org/manual/Tasks/pathconvert.html -->
-        <pathconvert pathsep=" " property="ksy-files">
-            <path> <!-- https://ant.apache.org/manual/using.html#path -->
-                <fileset dir="src/test/resources/ksy"> <!-- https://ant.apache.org/manual/Types/fileset.html -->
+    <target name="-get.list.of.ksy.files">
+        <pathconvert pathsep=" " property="ksy.files">
+            <path>
+                <fileset dir="src/test/resources/ksy">
                     <include name="*.ksy"/>
                 </fileset>
             </path>
             <mapper>
-                <!-- https://ant.apache.org/manual/Types/mapper.html#glob-mapper -->
-                <globmapper from="*" to="&quot;*&quot;"/>
+                <globmapper from="*" to="&quot;*&quot;"/> <!-- Wrap each path in quotes -->
             </mapper>
         </pathconvert>
+    </target>
 
 
-        <!-- https://ant.apache.org/manual/Tasks/exec.html -->
-        <exec executable="${ksc-absolute-path}" outputproperty="ksc-output"
-              failonerror="false" resultproperty="ksc-return-code"
+    <target name="compile.ksy.files.to.java" depends="-check.ksc.available,-get.list.of.ksy.files"
+            if="is.ksc.available">
+
+        <exec executable="${ksc.absolute.path}" outputproperty="ksc-output"
+              failonerror="false" resultproperty="ksc.return.code"
               failifexecutionfails="true">
-            <!-- https://ant.apache.org/manual/using.html#arg -->
-            <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --verbose file --java-package ${output-package} --debug ${ksy-files} "/>
+            <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --verbose file --java-package ${java.output.package} --read-pos ${ksy.files} "/>
         </exec>
 
-        <!-- https://ant.apache.org/manual/Tasks/echo.html -->
         <echo level="info" message="-------------------------- Output from kaitai-struct-compiler: ----------------"/>
         <echo level="info" message="${ksc-output}"/>
-        <echo level="info" message="-----------------------------------------------------------------------------"/>
+        <echo level="info" message="-------------------------------------------------------------------------------"/>
 
-        <fail message="kaitai-struct-compiler returned error code ${ksc-return-code}"> <!-- https://stackoverflow.com/a/27294765/7376577 -->
+        <fail message="kaitai-struct-compiler returned error code ${ksc.return.code}">
             <condition>
                 <not>
-                    <equals arg1="${ksc-return-code}" arg2="0"/>
+                    <equals arg1="${ksc.return.code}" arg2="0"/>
                 </not>
             </condition>
         </fail>
     </target>
 
-    <target name="clean-compiled-java-files">
-        <!-- https://ant.apache.org/manual/Tasks/delete.html -->
-        <delete dir="${project.build.testSourceDirectory}/${output-package}"/>
+
+    <target name="clean.java.files.compiled.from.ksy">
+        <delete dir="${project.build.testSourceDirectory}/${java.output.package}"/>
     </target>
 
 </project>
