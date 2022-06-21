@@ -19,7 +19,7 @@ public class ObjectAndNullTests extends KaitaiStruct {
     public static ObjectAndNullTests fromFile(String fileName) throws IOException {
         return new ObjectAndNullTests(new ByteBufferKaitaiStream(fileName));
     }
-    public static String[] _seqFields = new String[] { "switchOnThis", "sequentialFieldCompileTimeTypeIsIntAndRuntimeValueIsNull", "sequentialFieldCompileTimeTypeIsObjectAndRuntimeTypeIsInteger", "sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull" };
+    public static String[] _seqFields = new String[] { "switchOnThis", "sequentialFieldCompileTimeTypeIsIntAndRuntimeValueIsNull", "sequentialFieldCompileTimeTypeIsObjectAndRuntimeTypeIsInteger", "sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull", "sequentialFieldListOfObjects" };
 
     public ObjectAndNullTests(KaitaiStream _io) {
         this(_io, null, null);
@@ -70,6 +70,69 @@ public class ObjectAndNullTests extends KaitaiStruct {
             }
             _attrEnd.put("sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull", this._io.pos());
         }
+        _attrStart.put("sequentialFieldListOfObjects", this._io.pos());
+        sequentialFieldListOfObjects = new ArrayList<Object>(((Number) (2)).intValue());
+        for (int i = 0; i < 2; i++) {
+            {
+                ArrayList<Integer> _posList = _arrStart.get("sequentialFieldListOfObjects");
+                if (_posList == null) {
+                    _posList = new ArrayList<Integer>();
+                    _arrStart.put("sequentialFieldListOfObjects", _posList);
+                }
+                _posList.add(this._io.pos());
+            }
+            switch (switchOnThis()) {
+            case 32: {
+                {
+                    ArrayList<Integer> _posList = _arrStart.get("sequentialFieldListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrStart.put("sequentialFieldListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                this.sequentialFieldListOfObjects.add((Object) (this._io.readU1()));
+                {
+                    ArrayList<Integer> _posList = _arrEnd.get("sequentialFieldListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrEnd.put("sequentialFieldListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                break;
+            }
+            case 0: {
+                {
+                    ArrayList<Integer> _posList = _arrStart.get("sequentialFieldListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrStart.put("sequentialFieldListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                this.sequentialFieldListOfObjects.add((Object) (this._io.readBitsIntBe(1) != 0));
+                {
+                    ArrayList<Integer> _posList = _arrEnd.get("sequentialFieldListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrEnd.put("sequentialFieldListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                break;
+            }
+            }
+            {
+                ArrayList<Integer> _posList = _arrEnd.get("sequentialFieldListOfObjects");
+                if (_posList == null) {
+                    _posList = new ArrayList<Integer>();
+                    _arrEnd.put("sequentialFieldListOfObjects", _posList);
+                }
+                _posList.add(this._io.pos());
+            }
+        }
+        _attrEnd.put("sequentialFieldListOfObjects", this._io.pos());
     }
     private Integer instanceCompileTimeTypeIsIntAndRuntimeValueIsNull;
 
@@ -143,10 +206,88 @@ public class ObjectAndNullTests extends KaitaiStruct {
         }
         return this.instanceCompileTimeTypeIsObjectAndRuntimeValueIsNull;
     }
+    private ArrayList<Object> instanceListOfObjects;
+
+    /**
+     * This is an instance.
+     * The compile-time type (in the Java source code) will be ArrayList<java.lang.Object>.
+     * The runtime value will be a list of two integers.
+     * We do not want to iterate through the list to try to determine what type the contents are,
+     * so the icon should use the 'unknown' data type.
+     */
+    public ArrayList<Object> instanceListOfObjects() {
+        if (this.instanceListOfObjects != null)
+            return this.instanceListOfObjects;
+        _attrStart.put("instanceListOfObjects", this._io.pos());
+        instanceListOfObjects = new ArrayList<Object>(((Number) (2)).intValue());
+        for (int i = 0; i < 2; i++) {
+            {
+                ArrayList<Integer> _posList = _arrStart.get("instanceListOfObjects");
+                if (_posList == null) {
+                    _posList = new ArrayList<Integer>();
+                    _arrStart.put("instanceListOfObjects", _posList);
+                }
+                _posList.add(this._io.pos());
+            }
+            switch (switchOnThis()) {
+            case 32: {
+                {
+                    ArrayList<Integer> _posList = _arrStart.get("instanceListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrStart.put("instanceListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                this.instanceListOfObjects.add((Object) (this._io.readU1()));
+                {
+                    ArrayList<Integer> _posList = _arrEnd.get("instanceListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrEnd.put("instanceListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                break;
+            }
+            case 0: {
+                {
+                    ArrayList<Integer> _posList = _arrStart.get("instanceListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrStart.put("instanceListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                this.instanceListOfObjects.add((Object) (this._io.readBitsIntBe(1) != 0));
+                {
+                    ArrayList<Integer> _posList = _arrEnd.get("instanceListOfObjects");
+                    if (_posList == null) {
+                        _posList = new ArrayList<Integer>();
+                        _arrEnd.put("instanceListOfObjects", _posList);
+                    }
+                    _posList.add(this._io.pos());
+                }
+                break;
+            }
+            }
+            {
+                ArrayList<Integer> _posList = _arrEnd.get("instanceListOfObjects");
+                if (_posList == null) {
+                    _posList = new ArrayList<Integer>();
+                    _arrEnd.put("instanceListOfObjects", _posList);
+                }
+                _posList.add(this._io.pos());
+            }
+        }
+        _attrEnd.put("instanceListOfObjects", this._io.pos());
+        return this.instanceListOfObjects;
+    }
     private int switchOnThis;
     private Integer sequentialFieldCompileTimeTypeIsIntAndRuntimeValueIsNull;
     private Object sequentialFieldCompileTimeTypeIsObjectAndRuntimeTypeIsInteger;
     private Object sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull;
+    private ArrayList<Object> sequentialFieldListOfObjects;
     private ObjectAndNullTests _root;
     private KaitaiStruct _parent;
     public int switchOnThis() { return switchOnThis; }
@@ -176,6 +317,15 @@ public class ObjectAndNullTests extends KaitaiStruct {
      * We cannot tell what type this node is.
      */
     public Object sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull() { return sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull; }
+
+    /**
+     * This is a sequential field.
+     * The compile-time type (in the Java source code) will be ArrayList<java.lang.Object>.
+     * The runtime value will be a list of two integers.
+     * We do not want to iterate through the list to try to determine what type the contents are,
+     * so the icon should use the 'unknown' data type.
+     */
+    public ArrayList<Object> sequentialFieldListOfObjects() { return sequentialFieldListOfObjects; }
     public ObjectAndNullTests _root() { return _root; }
     public KaitaiStruct _parent() { return _parent; }
 }

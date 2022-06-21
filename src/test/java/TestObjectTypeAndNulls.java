@@ -3,11 +3,13 @@ import io.kaitai.struct.visualizer.icons.DataTypeEnum;
 import io.kaitai.struct.visualizer.icons.ScalarOrListEnum;
 import io.kaitai.struct.visualizer.icons.SequentialOrInstanceEnum;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+@DisplayName("Test behavior when types are java.lang.Object and/or values are null")
 public class TestObjectTypeAndNulls extends AbstractTest {
 
 
@@ -39,6 +41,12 @@ public class TestObjectTypeAndNulls extends AbstractTest {
     }
 
     @Test
+    void sequentialFieldListOfObjects() {
+        assertDataTypeForNode("sequentialFieldListOfObjects",
+                SequentialOrInstanceEnum.SEQUENTIAL, ScalarOrListEnum.LIST, DataTypeEnum.UNKNOWN);
+    }
+
+    @Test
     void instanceCompileTimeTypeIsIntAndRuntimeValueIsNull_useCompileTimeType() {
         assertDataTypeForNode(
                 "instanceCompileTimeTypeIsIntAndRuntimeValueIsNull",
@@ -57,6 +65,12 @@ public class TestObjectTypeAndNulls extends AbstractTest {
         assertDataTypeForNode(
                 "instanceCompileTimeTypeIsObjectAndRuntimeValueIsNull",
                 SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.SCALAR, DataTypeEnum.UNKNOWN);
+    }
+
+    @Test
+    void instanceListOfObjects() {
+        assertDataTypeForNode("instanceListOfObjects",
+                SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.LIST, DataTypeEnum.UNKNOWN);
     }
 
 

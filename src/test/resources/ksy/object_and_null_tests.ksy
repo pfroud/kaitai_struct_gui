@@ -38,6 +38,21 @@ seq:
         # The first byte of ascii.txt is 0x20
         0x20: u1
         0x00: b1
+  - id: sequential_field_list_of_objects
+    doc: |
+      This is a sequential field.
+      The compile-time type (in the Java source code) will be ArrayList<java.lang.Object>.
+      The runtime value will be a list of two integers.
+      We do not want to iterate through the list to try to determine what type the contents are,
+      so the icon should use the 'unknown' data type.
+    repeat: expr
+    repeat-expr: 2
+    type:
+      switch-on: switch_on_this
+      cases:
+        # The first byte of ascii.txt is 0x20
+        0x20: u1
+        0x00: b1
 instances:
   instance_compile_time_type_is_int_and_runtime_value_is_null:
     doc: |
@@ -68,6 +83,21 @@ instances:
       The runtime value will be null.
       We cannot tell what type this node is.
     if: false
+    type:
+      switch-on: switch_on_this
+      cases:
+        # The first byte of ascii.txt is 0x20
+        0x20: u1
+        0x00: b1
+  instance_list_of_objects:
+    doc: |
+      This is an instance.
+      The compile-time type (in the Java source code) will be ArrayList<java.lang.Object>.
+      The runtime value will be a list of two integers.
+      We do not want to iterate through the list to try to determine what type the contents are,
+      so the icon should use the 'unknown' data type.
+    repeat: expr
+    repeat-expr: 2
     type:
       switch-on: switch_on_this
       cases:
