@@ -3,8 +3,15 @@
     <!-- https://ant.apache.org/manual/ -->
 
     <property name="java.output.package" value="compiled_from_ksy"/>
+
+    <!-- This property is set automatically when run Ant is run through Maven.
+         Here we are setting it manually for when you want to run the Ant script alone. -->
     <property name="project.build.testSourceDirectory" value="src/test/java"/>
-    <property environment="env"/> <!-- Make environment variables accessible using the 'env' prefix -->
+
+    <property name="ksy.source.dir" value="src/test/resources/ksy"/>
+
+    <!-- Make environment variables accessible using the 'env' prefix -->
+    <property environment="env"/>
 
 
     <target name="-check.ksc.home.is.set">
@@ -30,7 +37,7 @@
     <target name="-get.list.of.ksy.files">
         <pathconvert pathsep=" " property="ksy.files">
             <path>
-                <fileset dir="src/test/resources/ksy">
+                <fileset dir="${ksy.source.dir}">
                     <include name="*.ksy"/>
                 </fileset>
             </path>
@@ -41,18 +48,41 @@
     </target>
 
 
+    <!--
+    <target name="check-if-up-to-date" depends="-get.list.of.ksy.files">
+        <uptodate property="already.up.to.date">
+            <srcfiles dir="${ksy.source.dir}" includes="*.ksy"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <scriptmapper language="javascript" setbeans="false">
+                    // map ksy file name to java file name
+                    firstCharacterUppercase = source.charAt(0).toUpperCase() + source.substring(1);
+                    regex = /_[a-z]/g;
+                    result = firstCharacterUppercase.replace(regex, function(str) {
+                    return str.substring(1).toUpperCase();
+                    });
+                    self.addMappedName(result);
+                </scriptmapper>
+                <globmapper from="*.ksy" to="${ksy.source.dir}/${java.output.package}/*.java"/>
+            </chainedmapper>
+        </uptodate>
+        <echo level="info" message="${already.up.to.date}"/>
+    </target>
+    -->
+
+
     <target name="compile.ksy.files.to.java" depends="-check.ksc.available,-get.list.of.ksy.files"
             if="is.ksc.available">
 
         <exec executable="${ksc.absolute.path}" outputproperty="ksc-output"
-              failonerror="false" resultproperty="ksc.return.code"
-              failifexecutionfails="true">
-            <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --verbose file --java-package ${java.output.package} --read-pos ${ksy.files} "/>
+              failonerror="true" failifexecutionfails="true">
+            <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --java-package ${java.output.package} --read-pos ${ksy.files} "/>
         </exec>
 
-        <echo level="info" message="-------------------------- Output from kaitai-struct-compiler: ----------------"/>
+        <!--
+        <echo level="info" message="====================== Output from kaitai-struct-compiler: ================="/>
         <echo level="info" message="${ksc-output}"/>
-        <echo level="info" message="-------------------------------------------------------------------------------"/>
+        <echo level="info" message="============================================================================"/>
 
         <fail message="kaitai-struct-compiler returned error code ${ksc.return.code}">
             <condition>
@@ -61,6 +91,7 @@
                 </not>
             </condition>
         </fail>
+        -->
     </target>
 
 
