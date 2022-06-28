@@ -71,28 +71,30 @@
     -->
 
 
-    <target name="compile.ksy.files.to.java" depends="-check.ksc.available,-get.list.of.ksy.files"
-            if="is.ksc.available">
-
+    <target name="-run.ksc" depends="-check.ksc.available, -get.list.of.ksy.files" if="is.ksc.available">
         <exec executable="${ksc.absolute.path}" outputproperty="ksc-output"
-              failonerror="true" failifexecutionfails="true">
+              failifexecutionfails="true" failonerror="false" resultproperty="ksc.return.code">
             <arg line="--target java --outdir &quot;${project.build.testSourceDirectory}&quot; --java-package ${java.output.package} --read-pos ${ksy.files} "/>
         </exec>
 
-        <!--
-        <echo level="info" message="====================== Output from kaitai-struct-compiler: ================="/>
-        <echo level="info" message="${ksc-output}"/>
-        <echo level="info" message="============================================================================"/>
-
-        <fail message="kaitai-struct-compiler returned error code ${ksc.return.code}">
-            <condition>
-                <not>
-                    <equals arg1="${ksc.return.code}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-        -->
+        <condition property="ksc.failed">
+            <not>
+                <equals arg1="${ksc.return.code}" arg2="0"/>
+            </not>
+        </condition>
     </target>
+
+
+    <target name="-check.ksc.error" if="ksc.failed" depends="-run.ksc">
+        <echo level="error" message="====================== Output from kaitai-struct-compiler: ================="/>
+        <echo level="error" message="${ksc-output}"/>
+        <echo level="error" message="============================================================================"/>
+
+        <fail message="kaitai-struct-compiler returned error code ${ksc.return.code}"/>
+    </target>
+
+
+    <target name="compile.ksy.files.to.java" depends="-run.ksc, -check.ksc.error"/>
 
 
     <target name="clean.java.files.compiled.from.ksy">
