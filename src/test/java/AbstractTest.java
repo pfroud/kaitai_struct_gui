@@ -51,8 +51,8 @@ public abstract class AbstractTest {
 
     }
 
-    void assertDataTypeForNode(String nodeName, SequentialOrInstanceEnum sequentialOrInstance,
-                               ScalarOrListEnum scalarOrList, DataTypeEnum dataType) {
+    void assertEnumsForNode(String nodeName, SequentialOrInstanceEnum sequentialOrInstance,
+                            ScalarOrListEnum scalarOrList, DataTypeEnum dataType) {
         assertTrue(nodeByName.containsKey(nodeName), "The map of node names does not contain \"" + nodeName + "\"");
         final ChunkNode chunkNode = nodeByName.get(nodeName);
 

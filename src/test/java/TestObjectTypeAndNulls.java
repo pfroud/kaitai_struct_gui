@@ -21,55 +21,55 @@ public class TestObjectTypeAndNulls extends AbstractTest {
 
     @Test
     void sequentialField_CompileTimeTypeIsIntAndRuntimeValueIsNull_useCompileTimeType() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "sequentialFieldCompileTimeTypeIsIntAndRuntimeValueIsNull",
                 SequentialOrInstanceEnum.SEQUENTIAL, ScalarOrListEnum.SCALAR, DataTypeEnum.INTEGER);
     }
 
     @Test
     void sequentialFieldCompileTimeTypeIsObjectAndRuntimeTypeIsInteger_useRuntimeType() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "sequentialFieldCompileTimeTypeIsObjectAndRuntimeTypeIsInteger",
                 SequentialOrInstanceEnum.SEQUENTIAL, ScalarOrListEnum.SCALAR, DataTypeEnum.INTEGER);
     }
 
     @Test
     void sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull_shouldBeUnknown() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "sequentialFieldCompileTimeTypeIsObjectAndRuntimeValueIsNull",
                 SequentialOrInstanceEnum.SEQUENTIAL, ScalarOrListEnum.SCALAR, DataTypeEnum.UNKNOWN);
     }
 
     @Test
     void sequentialFieldListOfObjects() {
-        assertDataTypeForNode("sequentialFieldListOfObjects",
+        assertEnumsForNode("sequentialFieldListOfObjects",
                 SequentialOrInstanceEnum.SEQUENTIAL, ScalarOrListEnum.LIST, DataTypeEnum.UNKNOWN);
     }
 
     @Test
     void instanceCompileTimeTypeIsIntAndRuntimeValueIsNull_useCompileTimeType() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "instanceCompileTimeTypeIsIntAndRuntimeValueIsNull",
                 SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.SCALAR, DataTypeEnum.INTEGER);
     }
 
     @Test
     void instanceCompileTimeTypeIsObjectAndRuntimeTypeIsFloat_useRuntimeType() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "instanceCompileTimeTypeIsObjectAndRuntimeTypeIsFloat",
                 SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.SCALAR, DataTypeEnum.INTEGER);
     }
 
     @Test
     void instanceCompileTimeTypeIsObjectAndRuntimeValueIsNull_shouldBeUnknown() {
-        assertDataTypeForNode(
+        assertEnumsForNode(
                 "instanceCompileTimeTypeIsObjectAndRuntimeValueIsNull",
                 SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.SCALAR, DataTypeEnum.UNKNOWN);
     }
 
     @Test
     void instanceListOfObjects() {
-        assertDataTypeForNode("instanceListOfObjects",
+        assertEnumsForNode("instanceListOfObjects",
                 SequentialOrInstanceEnum.INSTANCE, ScalarOrListEnum.LIST, DataTypeEnum.UNKNOWN);
     }
 

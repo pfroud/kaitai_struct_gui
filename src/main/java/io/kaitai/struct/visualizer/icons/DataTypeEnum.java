@@ -77,11 +77,8 @@ public enum DataTypeEnum {
                     type:
                       switch-on: switch_on_this
                       cases:
-                        1: my_type
+                        1: b1
                         2: u1
-                types:
-                  my_type:
-                    seq: []
             The compile-time class of 'type_can_change' will be Object. At runtime, the class will
             be 'my_type' or int (or null if the none of the switch cases matched).
 
@@ -111,7 +108,7 @@ public enum DataTypeEnum {
     static {
         addClassesToDataTypeMap(DataTypeEnum.BOOLEAN, boolean.class, Boolean.class);
         addClassesToDataTypeMap(DataTypeEnum.FLOAT, double.class, Double.class, float.class, Float.class);
-        addClassesToDataTypeMap(DataTypeEnum.INTEGER, int.class, Integer.class, long.class, Long.class);
+        addClassesToDataTypeMap(DataTypeEnum.INTEGER, byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class);
         addClassesToDataTypeMap(DataTypeEnum.STRING, String.class);
         addClassesToDataTypeMap(DataTypeEnum.BYTE_ARRAY, byte[].class);
     }
