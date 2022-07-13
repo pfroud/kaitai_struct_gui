@@ -58,10 +58,13 @@ public abstract class AbstractTest {
 
         assertEquals(nodeName, chunkNode.getName());
 
+        final String message = "The node type " + chunkNode.getClass().getSimpleName() + ", the value is type " +
+                (chunkNode.getValue() == null ? "null" : chunkNode.getValue().getClass().getSimpleName());
+
         final LayeredSvgIcon icon = new LayeredSvgIcon(chunkNode);
-        assertEquals(sequentialOrInstance, icon.SEQUENTIAL_OR_INSTANCE);
-        assertEquals(scalarOrList, icon.SCALAR_OR_LIST);
-        assertEquals(dataType, icon.DATA_TYPE);
+        assertEquals(sequentialOrInstance, icon.SEQUENTIAL_OR_INSTANCE, message);
+        assertEquals(scalarOrList, icon.SCALAR_OR_LIST, message);
+        assertEquals(dataType, icon.DATA_TYPE, message);
     }
 
 }
