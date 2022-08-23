@@ -33,6 +33,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -236,7 +237,7 @@ public class VisualizerPanel extends JPanel {
                 } catch (ExecutionException ex) {
                     ex.printStackTrace();
                     final String message = "<html>Couldn't compile the KSY file.<br>" +
-                            "The exception was: " + ex + ".<br>" +
+                            "The exception was: " + ex.getCause() + ".<br>" +
                             "See the console for the full stack trace.";
                     JOptionPane.showMessageDialog(MAIN_WINDOW, message, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE);
                     return;
@@ -250,10 +251,10 @@ public class VisualizerPanel extends JPanel {
                 if (binaryStreamToParse != null) {
                     try {
                         parseFileAndUpdateGui();
-                    } catch (Exception ex) {
+                    } catch (ReflectiveOperationException ex) {
                         ex.printStackTrace();
                         final String message = "<html>There was an error initializing Kaitai Struct or parsing the file.<br>" +
-                                "The exception was: " + ex + "<br>" +
+                                "The exception was: " + (ex instanceof InvocationTargetException ? ex.getCause() : ex) + "<br>" +
                                 "See the console for the full stack trace.";
                         JOptionPane.showMessageDialog(MAIN_WINDOW, message, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE);
                     }

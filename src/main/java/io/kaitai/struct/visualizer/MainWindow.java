@@ -20,6 +20,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public class MainWindow extends JFrame {
@@ -177,7 +178,7 @@ public class MainWindow extends JFrame {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 final String message = "<html>There was an error initializing Kaitai Struct or parsing the file.<br>" +
-                        "The exception was: " + ex + "<br>" +
+                        "The exception was: " + (ex instanceof InvocationTargetException ? ex.getCause() : ex) + "<br>" +
                         "See the console for the full stack trace.";
                 JOptionPane.showMessageDialog(this, message, APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
