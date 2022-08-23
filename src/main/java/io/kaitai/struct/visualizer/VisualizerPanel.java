@@ -28,6 +28,7 @@ import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -83,7 +84,6 @@ public class VisualizerPanel extends JPanel {
 
     private final JTree JTREE = new JTree(new DefaultMutableTreeNode("<root>"));
     private final JHexView HEX_EDITOR = new JHexView();
-    private final JSplitPane SPLIT_PANE;
     private final MainWindow MAIN_WINDOW;
 
     private ByteBufferKaitaiStream binaryStreamToParse;
@@ -127,8 +127,10 @@ public class VisualizerPanel extends JPanel {
         HEX_EDITOR.setBackgroundColorHexView(HEX_EDITOR.getBackground());
         HEX_EDITOR.setBackgroundColorAsciiView(HEX_EDITOR.getBackground());
 
-        SPLIT_PANE = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(JTREE), HEX_EDITOR);
-        SPLIT_PANE.setDividerLocation(200);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(JTREE), HEX_EDITOR);
+        splitPane.setDividerLocation(200);
+        setLayout(new BorderLayout());
+        add(splitPane);
 
         JTREE.setShowsRootHandles(true);
         JTREE.addTreeSelectionListener(event -> {
@@ -300,10 +302,6 @@ public class VisualizerPanel extends JPanel {
         final byte[] allBytes = kaitaiStructInstance._io().readBytesFull(); //read all remaining bytes
         HEX_EDITOR.setData(new SimpleDataProvider(allBytes));
         HEX_EDITOR.setDefinitionStatus(JHexView.DefinitionStatus.DEFINED);
-    }
-
-    public JSplitPane getSplitPane() {
-        return SPLIT_PANE;
     }
 
     /**

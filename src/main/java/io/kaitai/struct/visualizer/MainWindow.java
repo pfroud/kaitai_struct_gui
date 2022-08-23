@@ -50,7 +50,7 @@ public class MainWindow extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(getFileChooserPanel(), BorderLayout.NORTH);
         visualizerPanel = new VisualizerPanel(this);
-        getContentPane().add(visualizerPanel.getSplitPane(), BorderLayout.CENTER);
+        getContentPane().add(visualizerPanel, BorderLayout.CENTER);
         getContentPane().add(getStatusBarPanel(), BorderLayout.SOUTH);
 
         pack();
