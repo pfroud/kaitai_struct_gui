@@ -279,7 +279,8 @@ public class VisualizerPanel extends JPanel {
 
             // the read method parses the whole file.
             kaitaiStructInstance._io().seek(0);
-            final Method readMethod = kaitaiStructClass.getMethod("_read");
+            final Method readMethod = kaitaiStructClass.getDeclaredMethod("_read");
+            readMethod.setAccessible(true);
             readMethod.invoke(kaitaiStructInstance);
 
             JTREE.setModel(new StructModel(kaitaiStructInstance));
