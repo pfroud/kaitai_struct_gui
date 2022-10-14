@@ -164,8 +164,6 @@ public class VisualizerPanel extends JPanel {
                 return this;
             }
         });
-
-
     }
 
     public void setBinaryStreamToParse(ByteBufferKaitaiStream stream) {
@@ -345,7 +343,7 @@ public class VisualizerPanel extends JPanel {
      * Compiles Java source code of a Kaitai Struct parser into a Java class.
      *
      * @param sourceCode Java source code of a Kaitai Struct parser
-     * @param className  name of the Java class to create
+     * @param className name of the Java class to create
      * @return a Java class compiled from {@code sourceCode}
      * @throws Exception if compilation failed
      */
@@ -370,7 +368,7 @@ public class VisualizerPanel extends JPanel {
      * Instantiates a Kaitai Struct class so that the instance will read from the specified binary stream, and returns
      * the instance.
      *
-     * @param ksClass       the Kaitai Struct Java class to instantiate
+     * @param ksClass the Kaitai Struct Java class to instantiate
      * @param streamToParse the binary stream that the Kaitai Struct parser will parse
      * @return an instance of {@code ksClass} which will parse {@code streamToParse}
      * @throws ReflectiveOperationException if the instance could not be created
@@ -428,6 +426,16 @@ public class VisualizerPanel extends JPanel {
             }
         }
         throw new IllegalArgumentException(ksClass + " has no KaitaiStruct-generated constructor");
+    }
+
+    /**
+     * If you already compiled a KSY file into Java source code, you can add the
+     * Java file to your project's sources and then use it directly.
+     *
+     * @param compiledKaitaiStructClass an instance of {@code java.lang.Class}
+     */
+    public void setKaitaiStructClass(Class<? extends KaitaiStruct> compiledKaitaiStructClass) {
+        this.kaitaiStructClass = compiledKaitaiStructClass;
     }
 
     private static Object getDefaultValue(Class<?> clazz) {
