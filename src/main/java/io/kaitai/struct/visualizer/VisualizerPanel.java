@@ -450,5 +450,8 @@ public class VisualizerPanel extends JPanel {
         return null;
     }
 
+    public JTree getJTree(){
+        return JTREE;
+    }
 
 }
