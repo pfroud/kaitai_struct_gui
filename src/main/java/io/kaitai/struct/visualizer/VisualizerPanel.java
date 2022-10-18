@@ -450,8 +450,12 @@ public class VisualizerPanel extends JPanel {
         return null;
     }
 
-    public JTree getJTree(){
+    public JTree getTree() {
         return JTREE;
+    }
+
+    public JHexView getHexEditor() {
+        return HEX_EDITOR;
     }
 
 }
