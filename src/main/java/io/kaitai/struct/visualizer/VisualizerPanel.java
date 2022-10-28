@@ -1,71 +1,28 @@
 package io.kaitai.struct.visualizer;
 
 import io.kaitai.struct.ByteBufferKaitaiStream;
-import io.kaitai.struct.CompileLog;
-import io.kaitai.struct.JavaRuntimeConfig;
 import io.kaitai.struct.KaitaiStream;
 import io.kaitai.struct.KaitaiStruct;
-import io.kaitai.struct.RuntimeConfig;
-import io.kaitai.struct.Version;
-import io.kaitai.struct.format.ClassSpec;
-import io.kaitai.struct.format.KSVersion;
-import io.kaitai.struct.formats.JavaClassSpecs;
-import io.kaitai.struct.formats.JavaKSYParser;
-import io.kaitai.struct.languages.JavaCompiler$;
 import io.kaitai.struct.visualizer.icons.LayeredSvgIcon;
-import org.mdkt.compiler.InMemoryJavaCompiler;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
 import ru.mingun.kaitai.struct.tree.StructModel;
 import tv.porst.jhexview.JHexView;
 import tv.porst.jhexview.SimpleDataProvider;
-
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class VisualizerPanel extends JPanel {
-    /**
-     * Name of the Java package where the Java source code is generated from KSY file
-     */
-    private static final String DEST_PACKAGE = "io.kaitai.struct.visualized";
-
-    /**
-     * Regular expression with two groups: (1) class name and (2) type parameters.
-     * <p>
-     * Type parameters must be parsed with the {@link #PARAMETER_NAME} regex.
-     */
-    private static final Pattern TOP_CLASS_NAME_AND_PARAMETERS = Pattern.compile(
-            "public class (.+?) extends KaitaiStruct.*" +
-                    "public \\1\\(KaitaiStream _io, KaitaiStruct _parent, \\1 _root(.*?)\\)",
-            Pattern.DOTALL
-    );
-
-    /**
-     * Regular expression used to get parameter names from the generated Java source code.
-     * <p>
-     * First use the {@link #TOP_CLASS_NAME_AND_PARAMETERS} regex, then pass the matched string into this regex.
-     */
-    private static final Pattern PARAMETER_NAME = Pattern.compile(", (\\S+) ([^,\\s]+)");
 
     /**
      * Color of hex editor section headers.
@@ -84,7 +41,6 @@ public class VisualizerPanel extends JPanel {
 
     private final JTree JTREE = new JTree(new DefaultMutableTreeNode("<root>"));
     private final JHexView HEX_EDITOR = new JHexView();
-    private final MainWindow MAIN_WINDOW;
 
     private ByteBufferKaitaiStream binaryStreamToParse;
 
@@ -105,9 +61,8 @@ public class VisualizerPanel extends JPanel {
     private KaitaiStruct kaitaiStructInstance;
 
 
-    public VisualizerPanel(MainWindow mainWindow) {
+    public VisualizerPanel() {
         super();
-        MAIN_WINDOW = mainWindow;
 
         HEX_EDITOR.setSeparatorsVisible(false);
         HEX_EDITOR.setBytesPerColumn(1);
@@ -170,98 +125,6 @@ public class VisualizerPanel extends JPanel {
         binaryStreamToParse = stream;
     }
 
-    /**
-     * Compiles a Kaitai Struct YAML file into a Java class.
-     * <p>
-     * There are two steps:
-     * <ol>
-     *     <li>Compile the KSY file into Java source code.</li>
-     *     <li>Compile the Java source code into an instance of {@code java.lang.Class}.</li>
-     * </ol>
-     * <p>
-     * If compilation succeeds, then subsequent calls to the {@link #isParserReady} method return true.
-     * </p>
-     *
-     * @param ksyFileName path to the Kaitai Struct YAML file
-     */
-    public void compileKsyFile(String ksyFileName) {
-
-        new SwingWorker<
-                Class<? extends KaitaiStruct>, //the type returned by the doInBackground() and get() methods
-                String //the type passed to the publish() method and received by the process() method
-                >() {
-            @Override
-            protected Class<? extends KaitaiStruct> doInBackground() throws Exception {
-                publish("Compiling KSY file into Java source code...");
-                final String javaSourceCode = compileKsyFileToJavaSourceCode(ksyFileName);
-
-                //SwingUtilities.invokeLater(() -> new SourceCodeViewerJFrame(javaSourceCode).setVisible(true));
-
-                final Matcher topLevelClassMatcher = TOP_CLASS_NAME_AND_PARAMETERS.matcher(javaSourceCode);
-                if (!topLevelClassMatcher.find()) {
-                    throw new RuntimeException("Unable to find top-level class in generated .java");
-                }
-                final String className = topLevelClassMatcher.group(1); //the group at index zero is the whole match
-                parseUserParams(topLevelClassMatcher.group(2));
-
-                publish("Compiling Java source code into a Java class...");
-                return compileJavaSourceCodeToJavaClass(javaSourceCode, className);
-            }
-
-            private void parseUserParams(String paramsToParse) {
-                // TODO: get the user parameters out of this SwingWorker so we can use them.
-                final ArrayList<String> paramNames = new ArrayList<>();
-                final ArrayList<String> paramTypes = new ArrayList<>();
-                final Matcher paramMatcher = PARAMETER_NAME.matcher(paramsToParse);
-                while (paramMatcher.find()) {
-                    paramTypes.add(paramMatcher.group(1)); //the group at index zero is the whole match
-                    paramNames.add(paramMatcher.group(2));
-                }
-            }
-
-
-            @Override
-            protected void process(List<String> chunks) {
-                // This method runs on the Swing Event Dispatch Thread, so we can safely access the jLabel.
-                final String newestChunk = chunks.get(chunks.size() - 1);
-                MAIN_WINDOW.jLabelStatus.setText(newestChunk);
-            }
-
-            @Override
-            protected void done() {
-                // This method runs on the Swing Event Dispatch Thread.
-                try {
-                    kaitaiStructClass = get();
-                } catch (CancellationException | InterruptedException ignore) {
-                    return;
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                    final String message = "<html>Couldn't compile the KSY file.<br>" +
-                            "The exception was: " + ex.getCause() + ".<br>" +
-                            "See the console for the full stack trace.";
-                    JOptionPane.showMessageDialog(MAIN_WINDOW, message, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                MAIN_WINDOW.setCursor(Cursor.getDefaultCursor());
-                MAIN_WINDOW.jLabelStatus.setText("Done compiling KSY file.");
-                MAIN_WINDOW.jButtonChooseKsyFile.setEnabled(true);
-
-                // If we have already set the binary file we want to parse, then parse it now.
-                if (binaryStreamToParse != null) {
-                    try {
-                        parseFileAndUpdateGui();
-                    } catch (ReflectiveOperationException ex) {
-                        ex.printStackTrace();
-                        final String message = "<html>There was an error initializing Kaitai Struct or parsing the file.<br>" +
-                                "The exception was: " + (ex instanceof InvocationTargetException ? ex.getCause() : ex) + "<br>" +
-                                "See the console for the full stack trace.";
-                        JOptionPane.showMessageDialog(MAIN_WINDOW, message, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        }.execute();
-    }
 
     /**
      * If the parser and binary stream have both been set, then this method parses the stream
@@ -302,67 +165,6 @@ public class VisualizerPanel extends JPanel {
         HEX_EDITOR.setData(new SimpleDataProvider(allBytes));
         HEX_EDITOR.setDefinitionStatus(JHexView.DefinitionStatus.DEFINED);
     }
-
-    /**
-     * Compiles a Kaitai Struct YAML file into Java source code.
-     *
-     * @param ksyFileName path to the KSY file to compile
-     * @return a {@code String} of Java source code which is the result of compiling the KSY file
-     */
-    private static String compileKsyFileToJavaSourceCode(String ksyFileName) {
-        KSVersion.current_$eq(Version.version());
-        final ClassSpec spec = JavaKSYParser.fileNameToSpec(ksyFileName);
-        final JavaClassSpecs specs = new JavaClassSpecs(null, null, spec);
-
-        final RuntimeConfig config = new RuntimeConfig(
-                false,// autoRead - do not call `_read` automatically in constructor
-                true, // readStoresPos - enable generation of a position info which is accessed in DebugAids later
-                true, // opaqueTypes
-                null, // cppConfig
-                null, // goPackage
-                new JavaRuntimeConfig(
-                        DEST_PACKAGE,
-                        // Class to be invoked in `fromFile` helper methods
-                        "io.kaitai.struct.ByteBufferKaitaiStream",
-                        // Exception class expected to be thrown on end-of-stream errors
-                        "java.nio.BufferUnderflowException"
-                ),
-                null, // dotNetNamespace
-                null, // phpNamespace
-                null, // pythonPackage
-                null, // nimModule
-                null  // nimOpaque
-        );
-
-        io.kaitai.struct.Main.importAndPrecompile(specs, config).value();
-        final CompileLog.SpecSuccess result = io.kaitai.struct.Main.compile(specs, spec, JavaCompiler$.MODULE$, config);
-        return result.files().apply(0).contents();
-    }
-
-    /**
-     * Compiles Java source code of a Kaitai Struct parser into a Java class.
-     *
-     * @param sourceCode Java source code of a Kaitai Struct parser
-     * @param className name of the Java class to create
-     * @return a Java class compiled from {@code sourceCode}
-     * @throws Exception if compilation failed
-     */
-    @SuppressWarnings("unchecked")
-    private Class<? extends KaitaiStruct> compileJavaSourceCodeToJavaClass(String sourceCode, String className) throws Exception {
-        final String fullyQualifiedClassName = DEST_PACKAGE + "." + className;
-        final Class<?> classWithWildcardType = InMemoryJavaCompiler.newInstance().compile(fullyQualifiedClassName, sourceCode);
-
-        if (KaitaiStruct.class.isAssignableFrom(classWithWildcardType)) {
-            return (Class<? extends KaitaiStruct>) classWithWildcardType;
-        } else {
-            throw new RuntimeException(String.format(
-                    "the compiled class is not assignable from \"%s\". The compiled class is \"%s\", and its superclass is \"%s\".",
-                    KaitaiStruct.class, classWithWildcardType, classWithWildcardType.getSuperclass()
-            ));
-        }
-
-    }
-
 
     /**
      * Instantiates a Kaitai Struct class so that the instance will read from the specified binary stream, and returns
