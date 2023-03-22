@@ -60,6 +60,7 @@ public class VisualizerPanel extends JPanel {
      */
     private KaitaiStruct kaitaiStructInstance;
 
+    private Object[] userParams;
 
     public VisualizerPanel() {
         super();
@@ -125,6 +126,21 @@ public class VisualizerPanel extends JPanel {
         binaryStreamToParse = stream;
     }
 
+    /**
+     * Set values which will get passed as parameters into the Kaitai Struct object.
+     * <ul>
+     * <li>In a KSY file, these are in {@code params}.</li>
+     * <li>In a Java file, these are constructor arguments which come after
+     * {@code KaitaiStream _io, KaitaiStruct _parent, Rdm _root}.</li>
+     * </ul>
+     *
+     * @see <a href="https://doc.kaitai.io/user_guide.html#param-types">Kaitai Struct user guide
+     * section 7.10 "Parametric types"</a>
+     */
+    public void setUserParameters(Object... params) {
+        userParams = params;
+    }
+
 
     /**
      * If the parser and binary stream have both been set, then this method parses the stream
@@ -135,8 +151,9 @@ public class VisualizerPanel extends JPanel {
      */
     public void parseFileAndUpdateGui() throws ReflectiveOperationException {
         if (isParserReady() && binaryStreamToParse != null) {
-            // the kaitai struct constructor needs the stream to open.
-            kaitaiStructInstance = createKaitaiStructInstance(kaitaiStructClass, binaryStreamToParse);
+            // the stream must already be open when you call the kaitai struct constructor
+            kaitaiStructInstance = createKaitaiStructInstance(
+                    kaitaiStructClass, binaryStreamToParse, userParams);
 
             // the read method parses the whole file.
             kaitaiStructInstance._io().seek(0);
@@ -177,17 +194,24 @@ public class VisualizerPanel extends JPanel {
      */
     private static KaitaiStruct createKaitaiStructInstance(
             Class<? extends KaitaiStruct> ksClass,
-            /*List<String> paramNames,*/
-            ByteBufferKaitaiStream streamToParse)
+            ByteBufferKaitaiStream streamToParse,
+            Object[] userParams)
             throws ReflectiveOperationException {
         final Constructor<? extends KaitaiStruct> ctor = findConstructor(ksClass);
         final Class<?>[] paramTypes = ctor.getParameterTypes();
         final Object[] argsToPassIntoConstructor = new Object[paramTypes.length];
         argsToPassIntoConstructor[0] = streamToParse;
+        // index 1 is _parent
+        // index 2 is _root
         for (int i = 3; i < argsToPassIntoConstructor.length; ++i) {
-            argsToPassIntoConstructor[i] = getDefaultValue(paramTypes[i]);
+            final int indexInUserParamsArray = i - 3;
+            if (userParams != null && indexInUserParamsArray < userParams.length) {
+                argsToPassIntoConstructor[i] = userParams[indexInUserParamsArray];
+            } else {
+                argsToPassIntoConstructor[i] = getDefaultValue(paramTypes[i]);
+            }
         }
-        // TODO: get parameters from user
+
         return ctor.newInstance(argsToPassIntoConstructor);
     }
 
