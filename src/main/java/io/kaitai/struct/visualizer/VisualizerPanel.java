@@ -245,7 +245,7 @@ public class VisualizerPanel extends JPanel {
             final Class<?>[] types = ctor.getParameterTypes();
             if (types.length >= 3
                     && types[0] == KaitaiStream.class
-                    && types[1] == KaitaiStruct.class
+                    && KaitaiStruct.class.isAssignableFrom(types[1])
                     && types[2] == ksClass
             ) {
                 return (Constructor<? extends KaitaiStruct>) ctor;
