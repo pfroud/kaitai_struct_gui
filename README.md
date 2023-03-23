@@ -3,7 +3,7 @@
 This is a Java-based GUI for data structure visualizations in binary
 formats using [Kaitai Struct](http://kaitai.io).
 
-![screenshot](etc/screenshot.png)
+![screenshot](screenshot.png)
 
 Kaitai Struct is a declarative language used to describe various
 binary data structures, laid out in files or in memory: i.e. binary
