@@ -39,6 +39,21 @@ mvn install
 
 then the output will be in a subdirectory called `target`.
 
+## Compilation steps
+
+When a ksy file is selected in the gui, two things happen:
+
+<!-- https://mermaid-js.github.io/mermaid/#/flowchart -->
+
+```mermaid
+flowchart LR
+  KSYFile[Kaitai Struct YAML file\nmy_type.ksy]
+  JavaSourceCode[Java source code file\nmyType.java]
+  ClassFile[Java class file\nmyType.class]
+  KSYFile -- kaitai-struct-compiler --> JavaSourceCode
+  JavaSourceCode -- javac --> ClassFile
+```
+
 ## Usage
 
 Depending on the system, double-clicking on the jar file may launch the GUI.
