@@ -4,6 +4,8 @@ import io.kaitai.struct.ByteBufferKaitaiStream;
 import io.kaitai.struct.visualizer.KaitaiVisualizerPanel;
 import java.awt.BorderLayout;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -28,6 +30,11 @@ public class Main {
                 jframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 jframe.getContentPane().setLayout(new BorderLayout());
                 jframe.getContentPane().add(visualizerPanel);
+                jframe.setIconImages(Arrays.asList(
+                        new ImageIcon(Main.class.getResource("/kaitai-struct-icon-48.png")).getImage(),
+                        new ImageIcon(Main.class.getResource("/kaitai-struct-icon-32.png")).getImage(),
+                        new ImageIcon(Main.class.getResource("/kaitai-struct-icon-16.png")).getImage()
+                ));
                 jframe.pack();
                 jframe.setVisible(true);
             } catch (Exception ex) {
