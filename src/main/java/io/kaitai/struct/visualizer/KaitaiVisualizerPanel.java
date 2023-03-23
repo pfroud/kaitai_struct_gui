@@ -18,6 +18,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.lang.reflect.Method;
+import ru.mingun.kaitai.struct.Span;
 
 public class KaitaiVisualizerPanel extends JPanel {
 
@@ -59,12 +60,12 @@ public class KaitaiVisualizerPanel extends JPanel {
             for (TreePath path : JTREE.getSelectionPaths()) {
                 if (path.getLastPathComponent() instanceof ChunkNode) {
                     final ChunkNode node = (ChunkNode) path.getLastPathComponent();
-                    if (node.getSpan() != null) {
-                        // TODO do not select anything if the span has length zero
+                    final Span span = node.getSpan();
+                    if (span != null && span.getStart() != span.getEnd()) {
                         // Selection in nibbles, so multiply by 2
                         hexViewer.getSelectionModel().addSelectionInterval(
-                                2 * node.getSpan().getStart(),
-                                2 * node.getSpan().getEnd() - 1
+                                2 * span.getStart(),
+                                2 * span.getEnd() - 1
                         );
                     }
                 }
