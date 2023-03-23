@@ -19,12 +19,12 @@ import java.awt.Component;
 import java.awt.Font;
 import java.lang.reflect.Method;
 
-public class VisualizerPanel extends JPanel {
+public class KaitaiVisualizerPanel extends JPanel {
 
     private final JTree JTREE;
     private final JSplitPane SPLIT_PANE;
 
-    public VisualizerPanel(KaitaiStruct kaitaiStruct) throws ReflectiveOperationException {
+    public KaitaiVisualizerPanel(KaitaiStruct kaitaiStruct) throws ReflectiveOperationException {
         super();
 
         //////////////////////// Initialize the hex viewer ////////////////////
