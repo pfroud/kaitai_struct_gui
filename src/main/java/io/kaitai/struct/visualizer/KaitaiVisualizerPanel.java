@@ -3,7 +3,6 @@ package io.kaitai.struct.visualizer;
 import io.kaitai.struct.KaitaiStruct;
 import io.kaitai.struct.visualizer.icons.LayeredSvgIcon;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
-import ru.mingun.kaitai.struct.tree.StructModel;
 import tv.porst.jhexview.JHexView;
 import tv.porst.jhexview.SimpleDataProvider;
 import javax.swing.JPanel;
@@ -19,6 +18,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.lang.reflect.Method;
 import ru.mingun.kaitai.struct.Span;
+import ru.mingun.kaitai.struct.tree.KaitaiStructTreeModel;
 
 public class KaitaiVisualizerPanel extends JPanel {
 
@@ -96,7 +96,7 @@ public class KaitaiVisualizerPanel extends JPanel {
         final Method readMethod = kaitaiStruct.getClass().getDeclaredMethod("_read");
         readMethod.setAccessible(true);
         readMethod.invoke(kaitaiStruct);
-        JTREE.setModel(new StructModel(kaitaiStruct));
+        JTREE.setModel(new KaitaiStructTreeModel(kaitaiStruct));
 
         ///////////////////////// Set hex viewer data ///////////////////////////////
         kaitaiStruct._io().seek(0);

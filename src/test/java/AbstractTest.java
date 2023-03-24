@@ -4,7 +4,6 @@ import io.kaitai.struct.visualizer.icons.LayeredSvgIcon;
 import io.kaitai.struct.visualizer.icons.ScalarOrListEnum;
 import io.kaitai.struct.visualizer.icons.SequentialOrInstanceEnum;
 import ru.mingun.kaitai.struct.tree.ChunkNode;
-import ru.mingun.kaitai.struct.tree.StructModel;
 import ru.mingun.kaitai.struct.tree.StructNode;
 
 import javax.swing.tree.TreeNode;
@@ -19,6 +18,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import ru.mingun.kaitai.struct.tree.KaitaiStructTreeModel;
 
 public abstract class AbstractTest {
 
@@ -40,7 +40,7 @@ public abstract class AbstractTest {
         final Method fromFileMethod = kaitaiStructClass.getMethod("fromFile", String.class);
         final Object invoked = fromFileMethod.invoke(null, passToKaitaiStructConstructor);
         final KaitaiStruct kaitaiStructInstance = (KaitaiStruct) invoked;
-        rootNode = new StructModel(kaitaiStructInstance).getRoot();
+        rootNode = new KaitaiStructTreeModel(kaitaiStructInstance).getRoot();
 
         nodeByName = new HashMap<>();
         for (int i = 0; i < rootNode.getChildCount(); i++) {
