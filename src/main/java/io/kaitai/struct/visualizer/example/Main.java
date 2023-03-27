@@ -1,7 +1,7 @@
 package io.kaitai.struct.visualizer.example;
 
 import io.kaitai.struct.ByteBufferKaitaiStream;
-import io.kaitai.struct.visualizer.KaitaiVisualizerPanel;
+import io.kaitai.struct.visualizer.KaitaiStructVisualizerPanel;
 import java.awt.BorderLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class Main {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-                final KaitaiVisualizerPanel visualizerPanel = new KaitaiVisualizerPanel(
+                final KaitaiStructVisualizerPanel visualizerPanel = new KaitaiStructVisualizerPanel(
                         new Example(
                                 new ByteBufferKaitaiStream(new byte[]{1, 2, 3})
                         )

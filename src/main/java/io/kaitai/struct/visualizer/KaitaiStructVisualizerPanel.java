@@ -20,12 +20,12 @@ import java.lang.reflect.Method;
 import ru.mingun.kaitai.struct.Span;
 import ru.mingun.kaitai.struct.tree.KaitaiStructTreeModel;
 
-public class KaitaiVisualizerPanel extends JPanel {
+public class KaitaiStructVisualizerPanel extends JPanel {
 
     private final JTree JTREE;
     private final JSplitPane SPLIT_PANE;
 
-    public KaitaiVisualizerPanel(KaitaiStruct kaitaiStruct) throws ReflectiveOperationException {
+    public KaitaiStructVisualizerPanel(KaitaiStruct kaitaiStruct) throws ReflectiveOperationException {
         super();
 
         //////////////////////// Initialize the hex viewer ////////////////////
