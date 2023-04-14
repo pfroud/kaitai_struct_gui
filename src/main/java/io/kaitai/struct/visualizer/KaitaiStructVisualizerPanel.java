@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.swing.tree.TreeNode;
 import ru.mingun.kaitai.struct.Span;
 import ru.mingun.kaitai.struct.tree.KaitaiStructTreeModel;
+import ru.mingun.kaitai.struct.tree.KaitaiStructTreeModel.VisibilityOfInstancesAndParameters;
 import tv.porst.jhexview.SelectionModel.Interval;
 
 public class KaitaiStructVisualizerPanel extends JPanel {
@@ -39,6 +40,11 @@ public class KaitaiStructVisualizerPanel extends JPanel {
     private boolean runEventListeners = true;
 
     public KaitaiStructVisualizerPanel(KaitaiStruct kaitaiStruct) throws ReflectiveOperationException {
+        this(kaitaiStruct, VisibilityOfInstancesAndParameters.SHOW);
+    }
+
+    public KaitaiStructVisualizerPanel(KaitaiStruct kaitaiStruct,
+            VisibilityOfInstancesAndParameters visibilityOfInstancesAndParameters) throws ReflectiveOperationException {
         super();
 
         //////////////////////// Initialize the hex viewer ////////////////////
@@ -115,7 +121,7 @@ public class KaitaiStructVisualizerPanel extends JPanel {
         final Method readMethod = kaitaiStruct.getClass().getDeclaredMethod("_read");
         readMethod.setAccessible(true);
         readMethod.invoke(kaitaiStruct);
-        final KaitaiStructTreeModel treeModel = new KaitaiStructTreeModel(kaitaiStruct);
+        final KaitaiStructTreeModel treeModel = new KaitaiStructTreeModel(kaitaiStruct, visibilityOfInstancesAndParameters);
         JTREE.setModel(treeModel);
 
         ///////////////////////// Set hex viewer data ///////////////////////////////
