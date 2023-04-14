@@ -8,6 +8,7 @@
     <artifactId>kaitai_struct_visualizer_java</artifactId>
     <packaging>jar</packaging>
     <version>0.10-SNAPSHOT</version>
+    <name>Kaitai Struct visualizer</name>
 
     <url>http://kaitai.io</url>
 
